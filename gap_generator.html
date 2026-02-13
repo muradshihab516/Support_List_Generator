@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gap List Generator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container { width: 100%; max-width: 800px; }
+
+        /* Header */
+        .header-box {
+            text-align: center;
+            background: #161b22;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #30363d;
+            margin-bottom: 20px;
+        }
+
+        h1 { color: #58a6ff; font-size: 24px; margin-bottom: 5px; }
+        .subtitle { color: #8b949e; font-size: 14px; }
+
+        /* Input Section */
+        .input-section {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .threshold-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #0d1117;
+            padding: 5px 15px;
+            border-radius: 6px;
+            border: 1px solid #30363d;
+        }
+
+        .threshold-box input {
+            width: 40px;
+            background: transparent;
+            border: none;
+            color: #f85149;
+            font-weight: bold;
+            font-size: 16px;
+            text-align: center;
+            outline: none;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: #c9d1d9;
+            font-size: 13px;
+            outline: none;
+            resize: vertical;
+            font-family: monospace;
+            line-height: 1.4;
+        }
+
+        textarea:focus { border-color: #58a6ff; }
+
+        .btn-analyze {
+            width: 100%;
+            margin-top: 15px;
+            background: #238636;
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-analyze:hover { background: #2ea043; }
+
+        /* Stats */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .stat-box {
+            background: #161b22;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+        }
+        .stat-num { font-size: 20px; font-weight: bold; display: block; }
+        .stat-lbl { font-size: 12px; color: #8b949e; }
+        .c-blue { color: #58a6ff; } .c-green { color: #3fb950; }
+        .c-red { color: #f85149; } .c-yellow { color: #d29922; }
+
+        /* Results */
+        .result-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #21262d;
+            padding-bottom: 10px;
+        }
+        
+        .card-title { font-weight: bold; font-size: 16px; }
+
+        .notice-box {
+            background: #0d1117;
+            border-left: 3px solid #f85149;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #ff7b72;
+            white-space: pre-wrap;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        .footer-box {
+            background: #0d1117;
+            border-left: 3px solid #d29922;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #d29922;
+            white-space: pre-wrap;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+
+        .list-box {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            background: #0d1117;
+            padding: 12px 12px; /* Increased padding slightly */
+            margin-bottom: 10px; /* Increased margin for better spacing in UI */
+            border-radius: 6px;
+            font-size: 14px;
+            align-items: center;
+            border: 1px solid #21262d;
+        }
+
+        .row-left {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .serial {
+            color: #8b949e;
+            font-family: monospace;
+            font-weight: bold;
+            min-width: 25px;
+        }
+
+        .row span:last-child {
+            font-size: 11px;
+            background: #21262d;
+            padding: 2px 8px;
+            border-radius: 10px;
+            color: #8b949e;
+            white-space: nowrap;
+        }
+        .critical .row span:last-child { color: #f85149; background: rgba(248,81,73,0.1); }
+
+        .btn-copy {
+            background: #21262d;
+            color: #c9d1d9;
+            border: 1px solid #30363d;
+            padding: 5px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .btn-copy:hover { background: #30363d; color: #fff; }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f6feb;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            opacity: 0;
+            transition: 0.3s;
+            pointer-events: none;
+            z-index: 999;
+        }
+        .toast.show { opacity: 1; bottom: 50px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-box">
+        <h1>Gap List Generator</h1>
+        <p class="subtitle"> Automatic Gap Count & Formating </p>
+    </div>
+
+    <div class="input-section">
+        <div class="controls">
+            <span style="color: #e6edf3; font-weight: 600;">টেক্সট ইনপুট</span>
+            <div class="threshold-box">
+                <label style="font-size: 12px; color: #8b949e;">মেইন রেজাল্ট (≥)</label>
+                <input type="number" id="threshold" value="3" min="1">
+            </div>
+        </div>
+        <textarea id="inputText" placeholder="এখানে সম্পূর্ণ লিস্ট পেস্ট করুন..."></textarea>
+        <button class="btn-analyze" onclick="processData()">জেনারেট করুন</button>
+    </div>
+
+    <div class="stats-bar" id="statsBar" style="display:none;">
+        <div class="stat-box"><span class="stat-num c-blue" id="sLink">0</span><span class="stat-lbl">লিংক</span></div>
+        <div class="stat-box"><span class="stat-num c-green" id="sMem">0</span><span class="stat-lbl">মেম্বার</span></div>
+        <div class="stat-box"><span class="stat-num c-red" id="sMain">0</span><span class="stat-lbl">মেইন</span></div>
+        <div class="stat-box"><span class="stat-num c-yellow" id="sOther">0</span><span class="stat-lbl">অন্যান্য</span></div>
+    </div>
+
+    <div id="resultArea"></div>
+</div>
+
+<div class="toast" id="toast">কপি হয়েছে!</div>
+
+<script>
+    const HEADER_TEXT = `.  .  . 🚨 অফিসিয়াল নোটিশ 🚨 .  .  . 
+       🚫  KICKED OUT ALERT  🚫
+
+৩টির বেশি পোস্টে গ্যাপ ও কমেন্ট সাপোর্ট না করায়
+গ্রুপ রুলস অনুযায়ী সংশ্লিষ্ট আইডিগুলোকে Support Link Group থেকে রিমুভ করা হয়েছে।
+
+Gap Supporters List ⬇️`;
+
+    const FOOTER_TEXT = `📢 পুনরায় এড হতে হলে আপনাদেরকে —
+✅ গ্যাপ যাওয়া সব পোস্টে সাপোর্ট কমপ্লিট করতে হবে
+✅ একদিন নিজের লিংক না দিয়ে ফ্রি সাপোর্ট দিতে হবে
+
+⚠️ সাপোর্ট সম্পুর্ন করে এডমিনকে জানানোর পরেই পুনরায় আপনাদেরকে এড করা হবে।`;
+
+    let copyMainText = "";
+    let copyOtherText = "";
+
+    function processData() {
+        const text = document.getElementById('inputText').value;
+        const threshold = parseInt(document.getElementById('threshold').value) || 3;
+
+        if (!text.trim()) {
+            showToast("বক্সে ডাটা পেস্ট করুন!");
+            return;
+        }
+
+        const lines = text.split('\n');
+        let currentLink = '';
+        let database = {};
+        let linksFound = new Set();
+
+        lines.forEach(line => {
+            line = line.trim();
+            const linkMatch = line.match(/Link\s*(?:No)?[-:\s]*(\d+)/i);
+            if (linkMatch) {
+                currentLink = linkMatch[1];
+                linksFound.add(currentLink);
+                return;
+            }
+            if (line.includes('@')) {
+                const name = line.substring(line.indexOf('@')).trim();
+                if (currentLink) {
+                    if (!database[name]) database[name] = [];
+                    if (!database[name].includes(currentLink)) database[name].push(currentLink);
+                }
+            }
+        });
+
+        const sortedNames = Object.keys(database).sort((a, b) => database[b].length - database[a].length);
+
+        let mainHtml = '';
+        let otherHtml = '';
+        let mainBody = '';
+        let otherBody = '';
+        let countMain = 0;
+        let countOther = 0;
+
+        let serialMain = 1;
+        let serialOther = 1;
+
+        sortedNames.forEach((name) => {
+            const gaps = database[name];
+            const count = gaps.length;
+            
+            // \n\n ব্যবহার করা হয়েছে স্পেস বাড়ানোর জন্য
+            if (count >= threshold) {
+                // Main List
+                mainBody += `${serialMain}. ${name} সাপোর্ট গ্যাপ ${count} পোস্ট (${gaps.join(', ')})\n\n`;
+                mainHtml += `
+                    <div class="row">
+                        <div class="row-left">
+                            <span class="serial">${serialMain}.</span>
+                            <span>${name}</span>
+                        </div>
+                        <span>${count} পোস্ট</span>
+                    </div>`;
+                serialMain++;
+                countMain++;
+            } else {
+                // Other List
+                otherBody += `${serialOther}. ${name} সাপোর্ট গ্যাপ ${count} পোস্ট (${gaps.join(', ')})\n\n`;
+                otherHtml += `
+                    <div class="row">
+                        <div class="row-left">
+                            <span class="serial">${serialOther}.</span>
+                            <span>${name}</span>
+                        </div>
+                        <span>${count} পোস্ট</span>
+                    </div>`;
+                serialOther++;
+                countOther++;
+            }
+        });
+
+        copyMainText = `${HEADER_TEXT}\n\n${mainBody}${FOOTER_TEXT}`;
+        copyOtherText = `🟡 Warning List (Less than ${threshold} gaps)\n\n${otherBody}`;
+
+        // UI Update
+        document.getElementById('sLink').innerText = linksFound.size;
+        document.getElementById('sMem').innerText = sortedNames.length;
+        document.getElementById('sMain').innerText = countMain;
+        document.getElementById('sOther').innerText = countOther;
+        document.getElementById('statsBar').style.display = 'grid';
+
+        const resultDiv = document.getElementById('resultArea');
+        resultDiv.innerHTML = '';
+
+        if (countMain > 0) {
+            resultDiv.innerHTML += `
+                <div class="result-card critical">
+                    <div class="card-header">
+                        <span class="card-title" style="color:#f85149">🚨 মেইন রেজাল্ট</span>
+                        <button class="btn-copy" onclick="copyToClipboard(copyMainText)">📋 কপি করুন</button>
+                    </div>
+                    <div class="notice-box">${HEADER_TEXT}</div>
+                    <div class="list-box">${mainHtml}</div>
+                    <div class="footer-box">${FOOTER_TEXT}</div>
+                </div>
+            `;
+        } else {
+            resultDiv.innerHTML += `
+                <div class="result-card">
+                    <div class="card-header"><span class="card-title">🚨 মেইন রেজাল্ট</span></div>
+                    <div style="text-align:center;color:#8b949e;padding:15px;">কাউকে পাওয়া যায়নি</div>
+                </div>`;
+        }
+
+        if (countOther > 0) {
+            resultDiv.innerHTML += `
+                <div class="result-card">
+                    <div class="card-header">
+                        <span class="card-title" style="color:#d29922">🟡 অন্যান্য গ্যাপ</span>
+                        <button class="btn-copy" onclick="copyToClipboard(copyOtherText)">📋 কপি করুন</button>
+                    </div>
+                    <div class="list-box">${otherHtml}</div>
+                </div>
+            `;
+        }
+
+        showToast("✅ লিস্ট তৈরি হয়েছে!");
+    }
+
+    function copyToClipboard(text) {
+        if(!text) return;
+        navigator.clipboard.writeText(text).then(() => showToast("📋 কপি হয়েছে!"))
+        .catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast("📋 কপি হয়েছে!");
+        });
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.innerText = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2000);
+    }
+</script>
+
+</body>
+</html>
