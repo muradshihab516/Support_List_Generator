@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>সাপোর্ট লিস্ট জেনারেটর</title>
-    
-    <!-- CSS ফাইল লিংক -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -33,6 +31,17 @@
         </div>
 
         <div class="output-section" id="outputSection">
+            <!-- ডুপ্লিকেট সেকশন - নতুন -->
+            <div class="duplicate-section" id="duplicateSection">
+                <div class="duplicate-header">
+                    <span class="duplicate-icon">⚠️</span>
+                    <span class="duplicate-title">ডুপ্লিকেট নাম পাওয়া গেছে!</span>
+                    <span class="duplicate-badge" id="duplicateBadge">0</span>
+                    <button class="duplicate-close" id="duplicateCloseBtn" onclick="toggleDuplicateDetails()">▼</button>
+                </div>
+                <div class="duplicate-body" id="duplicateBody"></div>
+            </div>
+
             <div class="summary-section">
                 <div class="summary-card total">
                     <div class="number" id="totalCount">0</div>
@@ -49,6 +58,11 @@
                 <div class="summary-card nopost">
                     <div class="number" id="nopostCount">0</div>
                     <div class="label">No Post</div>
+                </div>
+                <!-- ডুপ্লিকেট কার্ড - নতুন -->
+                <div class="summary-card duplicate" id="duplicateCard">
+                    <div class="number" id="duplicateCount">0</div>
+                    <div class="label">ডুপ্লিকেট</div>
                 </div>
             </div>
 
@@ -73,85 +87,28 @@
             <p>💡 টিপস: ✅ চিহ্ন দিয়ে সাপোর্টার চিহ্নিত করুন</p>
         </div>
     </div>
- <!DOCTYPE html>
-<html lang="bn">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Main Dashboard</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background: #0d1117;
-            color: #c9d1d9;
-            min-height: 100vh;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
 
-        h1 {
-            margin-bottom: 2.5rem;
-            color: #58a6ff;
-            font-weight: 600;
-            font-size: 2.2rem;
-        }
-
-        .open-btn {
-            background: #161b22;
-            color: #79c0ff;
-            border: 1px solid #30363d;
-            padding: 1rem 2.8rem;
-            font-size: 1.15rem;
-            font-weight: 600;
-            border-radius: 10px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.7rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.6),
-                        inset 0 1px 0 rgba(255,255,255,0.03);
-            transition: all 0.25s ease;
-            letter-spacing: 0.3px;
-        }
-
-        .open-btn:hover {
-            background: #21262d;
-            color: #a5d6ff;
-            border-color: #388bfd;
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(88, 166, 255, 0.18),
-                        inset 0 1px 0 rgba(255,255,255,0.05);
-        }
-
-        .open-btn:active {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(88, 166, 255, 0.12);
-        }
-
-        .hint {
-            margin-top: 1.8rem;
-            color: #8b949e;
-            font-size: 0.95rem;
-        }
-    </style>
-</head>
-<body>
-
-     
-
-    <a href="gap_generator.html" target="_blank" class="open-btn">
+    <a href="gap_generator.html" target="_blank" class="floating-btn">
         🚀 Gap List Generator
     </a>
 
-    
+    <!-- ডার্ক পপআপ মোডাল -->
+    <div class="modal-overlay" id="duplicateModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <div class="modal-title-area">
+                    <span class="modal-warning-icon">⚠️</span>
+                    <h2>ডুপ্লিকেট নাম সনাক্ত হয়েছে!</h2>
+                </div>
+                <button class="modal-close-btn" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer">
+                <button class="modal-ok-btn" onclick="closeModal()">✅ বুঝেছি, বন্ধ করুন</button>
+            </div>
+        </div>
+    </div>
 
-</body>
-</html>
-    <!-- JavaScript ফাইল লিংক -->
     <script src="script.js"></script>
 </body>
-                    </html>
+            </html>
