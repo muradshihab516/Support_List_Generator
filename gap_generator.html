@@ -268,19 +268,19 @@
 <div class="toast" id="toast">কপি হয়েছে!</div>
 
 <script>
-    const HEADER_TEXT = `.  .  . 🚨 অফিসিয়াল নোটিশ 🚨 .  .  . 
+    const HEADER_TEXT = `.  .  . 🚨 অফিসিয়াল নোটিশ 🚨 .  .  . 
        🚫  KICKED OUT ALERT  🚫
 
-৩টির বেশি পোস্ট সাপোর্ট গ্যাপ ও কমেন্ট না করায়
-গ্রুপ রুলস অনুযায়ী সংশ্লিষ্ট আইডিগুলোকে Support Link Group থেকে রিমুভ করা হয়েছে।
+৩টির বেশি পোস্ট সাপোর্ট গ্যাপ ও কমেন্ট না করায়
+গ্রুপ রুলস অনুযায়ী সংশ্লিষ্ট আইডিগুলোকে Support Link Group থেকে রিমুভ করা হয়েছে।
 
 Gap Supporters List ⬇️`;
 
-    const FOOTER_TEXT = `📢 পুনরায় এড হতে হলে আপনাদেরকে —
-✅ গ্যাপ যাওয়া সব পোস্টে সাপোর্ট কমপ্লিট করতে হবে
-✅ একদিন নিজের লিংক না দিয়ে ফ্রি সাপোর্ট দিতে হবে
+    const FOOTER_TEXT = `📢 পুনরায় এড হতে হলে আপনাদেরকে —
+✅ গ্যাপ যাওয়া সব পোস্টে সাপোর্ট কমপ্লিট করতে হবে
+✅ একদিন নিজের লিংক না দিয়ে ফ্রি সাপোর্ট দিতে হবে
 
-⚠️ সাপোর্ট সম্পুর্ন করে এডমিনকে জানানোর পরেই পুনরায় আপনাদেরকে এড করা হবে।`;
+⚠️ সাপোর্ট সম্পুর্ন করে এডমিনকে জানানোর পরেই পুনরায় আপনাদেরকে এড করা হবে।`;
 
     let copyMainText = "";
     let copyOtherText = "";
@@ -301,17 +301,31 @@ Gap Supporters List ⬇️`;
 
         lines.forEach(line => {
             line = line.trim();
+            
+            // Link নম্বর খোঁজা
             const linkMatch = line.match(/Link\s*(?:No)?[-:\s]*(\d+)/i);
             if (linkMatch) {
                 currentLink = linkMatch[1];
                 linksFound.add(currentLink);
                 return;
             }
-            if (line.includes('@')) {
-                const name = line.substring(line.indexOf('@')).trim();
-                if (currentLink) {
+            
+            // "মোট গ্যাপ" বা "তে যারা কমেন্ট" লাইন স্কিপ করা
+            if (line.includes('মোট গ্যাপ') || line.includes('তে যারা কমেন্ট') || line === '') {
+                return;
+            }
+            
+            // নম্বর দিয়ে শুরু হওয়া লাইন থেকে নাম বের করা (1. Name, 2. Name ইত্যাদি)
+            const nameMatch = line.match(/^\d+[\.\)]\s*(.+)$/);
+            if (nameMatch && currentLink) {
+                let name = nameMatch[1].trim();
+                
+                // নাম যদি খালি না হয় এবং শুধু সংখ্যা না হয়
+                if (name && !/^\d+$/.test(name)) {
                     if (!database[name]) database[name] = [];
-                    if (!database[name].includes(currentLink)) database[name].push(currentLink);
+                    if (!database[name].includes(currentLink)) {
+                        database[name].push(currentLink);
+                    }
                 }
             }
         });
@@ -332,7 +346,6 @@ Gap Supporters List ⬇️`;
             const gaps = database[name];
             const count = gaps.length;
             
-            // \n\n ব্যবহার করা হয়েছে স্পেস বাড়ানোর জন্য
             if (count >= threshold) {
                 // Main List
                 mainBody += `${serialMain}. ${name} সাপোর্ট গ্যাপ ${count} পোস্ট (${gaps.join(', ')})\n\n`;
@@ -342,7 +355,7 @@ Gap Supporters List ⬇️`;
                             <span class="serial">${serialMain}.</span>
                             <span>${name}</span>
                         </div>
-                        <span>${count} পোস্ট</span>
+                        <span class="gap-count">${count} পোস্ট (Link: ${gaps.join(', ')})</span>
                     </div>`;
                 serialMain++;
                 countMain++;
@@ -355,7 +368,7 @@ Gap Supporters List ⬇️`;
                             <span class="serial">${serialOther}.</span>
                             <span>${name}</span>
                         </div>
-                        <span>${count} পোস্ট</span>
+                        <span class="gap-count">${count} পোস্ট (Link: ${gaps.join(', ')})</span>
                     </div>`;
                 serialOther++;
                 countOther++;
@@ -379,19 +392,19 @@ Gap Supporters List ⬇️`;
             resultDiv.innerHTML += `
                 <div class="result-card critical">
                     <div class="card-header">
-                        <span class="card-title" style="color:#f85149">🚨 মেইন রেজাল্ট</span>
+                        <span class="card-title" style="color:#f85149">🚨 মেইন রেজাল্ট (${countMain} জন)</span>
                         <button class="btn-copy" onclick="copyToClipboard(copyMainText)">📋 কপি করুন</button>
                     </div>
-                    <div class="notice-box">${HEADER_TEXT}</div>
+                    <div class="notice-box">${HEADER_TEXT.replace(/\n/g, '<br>')}</div>
                     <div class="list-box">${mainHtml}</div>
-                    <div class="footer-box">${FOOTER_TEXT}</div>
+                    <div class="footer-box">${FOOTER_TEXT.replace(/\n/g, '<br>')}</div>
                 </div>
             `;
         } else {
             resultDiv.innerHTML += `
                 <div class="result-card">
                     <div class="card-header"><span class="card-title">🚨 মেইন রেজাল্ট</span></div>
-                    <div style="text-align:center;color:#8b949e;padding:15px;">কাউকে পাওয়া যায়নি</div>
+                    <div style="text-align:center;color:#8b949e;padding:15px;">কাউকে পাওয়া যায়নি</div>
                 </div>`;
         }
 
@@ -399,7 +412,7 @@ Gap Supporters List ⬇️`;
             resultDiv.innerHTML += `
                 <div class="result-card">
                     <div class="card-header">
-                        <span class="card-title" style="color:#d29922">🟡 অন্যান্য গ্যাপ</span>
+                        <span class="card-title" style="color:#d29922">🟡 অন্যান্য গ্যাপ (${countOther} জন)</span>
                         <button class="btn-copy" onclick="copyToClipboard(copyOtherText)">📋 কপি করুন</button>
                     </div>
                     <div class="list-box">${otherHtml}</div>
@@ -407,12 +420,12 @@ Gap Supporters List ⬇️`;
             `;
         }
 
-        showToast("✅ লিস্ট তৈরি হয়েছে!");
+        showToast(`✅ মোট ${sortedNames.length} জনের লিস্ট তৈরি হয়েছে!`);
     }
 
     function copyToClipboard(text) {
         if(!text) return;
-        navigator.clipboard.writeText(text).then(() => showToast("📋 কপি হয়েছে!"))
+        navigator.clipboard.writeText(text).then(() => showToast("📋 কপি হয়েছে!"))
         .catch(() => {
             const ta = document.createElement('textarea');
             ta.value = text;
@@ -420,7 +433,7 @@ Gap Supporters List ⬇️`;
             ta.select();
             document.execCommand('copy');
             document.body.removeChild(ta);
-            showToast("📋 কপি হয়েছে!");
+            showToast("📋 কপি হয়েছে!");
         });
     }
 
@@ -431,6 +444,5 @@ Gap Supporters List ⬇️`;
         setTimeout(() => t.classList.remove('show'), 2000);
     }
 </script>
-
 </body>
 </html>
