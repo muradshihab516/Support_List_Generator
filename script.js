@@ -213,18 +213,18 @@ function generateLists() {
 
     const lines = input.split('\n');
 
-    // Extract date and day
+    // Extract date and day (Fix: স্পেস থাকলেও ডিটেক্ট করবে)
     let date = '';
     let day = '';
 
     for (let line of lines) {
-        if (line.includes('তারিখ:')) {
-            const match = line.match(/তারিখ:\s*([0-9\-\/\.]+)/);
-            if (match) date = match[1];
+        if (line.includes('তারিখ')) {
+            const match = line.match(/তারিখ\s*:\s*([0-9\-\/\.\s]+)/);
+            if (match) date = match[1].trim();
         }
-        if (line.includes('বার:')) {
-            const match = line.match(/বার:\s*(\S+)/);
-            if (match) day = match[1];
+        if (line.includes('বার')) {
+            const match = line.match(/বার\s*:\s*(\S+)/);
+            if (match) day = match[1].trim();
         }
     }
 
@@ -247,8 +247,10 @@ function generateLists() {
 
             const hasCheckmark = content.includes('✅');
 
+            // Fix: ❌ No Post ❌ এবং অন্যান্য সব ফরম্যাট ডিটেক্ট করার লজিক
             const isNoPost = content.includes('𝙉𝙤 𝙋𝙤𝙨𝙩') ||
                 content.toLowerCase().includes('no post') ||
+                content.includes('❌') ||
                 (content.includes('🅾️') && content.length < 30);
 
             let name = content.replace(/✅/g, '').trim();
@@ -271,7 +273,7 @@ function generateLists() {
 
     // ডুপ্লিকেট চেক
     const duplicates = checkDuplicateNames(entries);
-    window._lastDuplicates = duplicates; // মোডাল রি-ওপেনের জন্য সেভ
+    window._lastDuplicates = duplicates; 
 
     // Generate All Done List
     let doneListText = `📅 তারিখ: ${date}\n📆 বার: ${day}\n\nযারা সাপোর্ট করেছেন\n\n👇👇👇\n\n`;
@@ -279,7 +281,6 @@ function generateLists() {
     entries.forEach((entry) => {
         const num = getNumberEmoji(entry.position);
         if (entry.isNoPost) {
-            // পরিবর্তন: N/A → 🅾️𝙉𝙤 𝙋𝙤𝙨𝙩🅾️
             doneListText += `${num}➤🅾️𝙉𝙤 𝙋𝙤𝙨𝙩🅾️\n`;
         } else if (entry.hasCheckmark) {
             doneListText += `${num}➤${entry.name}\n`;
